@@ -1,45 +1,48 @@
-const output = document.getElementById("output");
-const btn = document.getElementById("download-images-button");
-const errorDiv = document.getElementById("error");
-const loading = document.getElementById("loading");
-
-const images = [
-  { url: "https://picsum.photos/id/237/200/300" },
-  { url: "https://picsum.photos/id/238/200/300" },
-  { url: "https://picsum.photos/id/239/200/300" },
-];
-
-function downloadImage(link) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = link;
-
-    img.onload = () => resolve({ image: link, message: "Image loaded successfully" });
-    img.onerror = () => reject(`Failed to load image: ${link}`);
-  });
-}
-
-function downloadImages() {
-  loading.style.display = "block";
-  output.innerHTML = "";
-  errorDiv.innerHTML = "";
-
-  const downloadPromises = images.map((img) => downloadImage(img.url));
-
-  Promise.all(downloadPromises)
-    .then((res) => {
-      res.forEach((t) => {
-        const img = document.createElement("img");
-        img.src = t.image;
-        output.appendChild(img);
-      });
-    })
-    .catch((err) => {
-      errorDiv.innerText = err;
-    })
-    .finally(() => {
-      loading.style.display = "none";
-    });
-}
-
-btn.addEventListener("click", downloadImages);
+     const images = [ 
+   { 
+     url: "https://picsum.photos/id/237/200/300", 
+     alt: "Image 1", 
+   }, 
+   { 
+     url: "https://picsum.photos/id/238/200/300", 
+     alt: "Image 2", 
+   }, 
+   { 
+     url: "https://picsum.photos/id/239/200/300", 
+     alt: "Image 3", 
+   } 
+  
+ ]; 
+  
+ function downloadImages(images) { 
+   const promises = images.map(image => { 
+     return new Promise((resolve, reject) => { 
+       const img = new Image(); 
+       img.src = image.url; 
+       img.alt = image.alt; 
+       img.onload = () => { 
+         resolve(img); 
+       }; 
+       img.onerror = () => { 
+         reject(`Failed to load image's URL: ${image.url}`); 
+       }; 
+     }); 
+   }); 
+  
+   Promise.all(promises) 
+     .then(imgs => { 
+       const output = document.getElementById('output'); 
+                 output.innerHTML = null; 
+       imgs.forEach(img => { 
+         output.appendChild(img); 
+       }); 
+     }) 
+     .catch(error => { 
+       console.error(error); 
+     }); 
+ } 
+  
+ const button = document.getElementById('download-images-button'); 
+ button.addEventListener('click', () => { 
+   downloadImages(images); 
+ });
